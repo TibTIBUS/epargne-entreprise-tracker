@@ -62,7 +62,7 @@ export const AppProvider = ({ children }) => {
   const totalGain = getTotalGain(marketGain, totalAbondement);
   const gainPercentage = getGainPercentage(totalGain, totalContributions);
   
-  const now = new Date();
+const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1; // 1-12
   
@@ -70,7 +70,18 @@ export const AppProvider = ({ children }) => {
   const yearEndProjection = getYearEndProjection(appData.settings, appData.operations, currentYear, currentMonth);
   const tenYearProjection = getTenYearProjection(appData.settings, appData.operations, currentYear);
   const blockingInfo = getBlockingInfo(appData.operations);
-
+  
+  // Calcul du total des versements personnels YTD (mois écoulés de l'année en cours)
+  const ytdPersonalContributions = yearlyChartData
+    .slice(0, currentMonth - 1) // mois 0 à currentMonth-2
+    .reduce((sum, month) => sum + month.contributions, 0);
+  
+  // Abondement reçu YTD = min(YTD personal × ratio, plafond annuel)
+  const ytdAbondementReceived = Math.min(
+    ytdPersonalContributions * settings.ABONDMENT_RATIO,
+    settings.ABONDMENT_ANNUAL_CAP
+  );
+  
   const value = {
     // État
     ...appData,
@@ -86,6 +97,7 @@ export const AppProvider = ({ children }) => {
     yearEndProjection,
     tenYearProjection,
     blockingInfo,
+    ytdAbondementReceived,
     currentYear,
     currentMonth,
     

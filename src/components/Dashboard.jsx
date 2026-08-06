@@ -18,7 +18,7 @@ const Dashboard = () => {
     yearEndProjection,
     tenYearProjection,
     blockingInfo,
-    LABELS
+    ytdAbondementReceived
   } = useApp();
 
   const formatNumber = (num) => new Intl.NumberFormat('fr-FR', {
@@ -83,7 +83,7 @@ const Dashboard = () => {
               <h3 className="text-sm font-medium text-gray-500">
                 {LABELS.dashboard.totalGain}
               </h3>
-              <p className=`{mt-1 text-2xl font-bold ${totalGain >= 0 ? "text-green-600" : "text-red-600"}}`>
+              <p className={`mt-1 text-2xl font-bold ${totalGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatNumber(totalGain)}
               </p>
             </div>
@@ -95,9 +95,9 @@ const Dashboard = () => {
               <h3 className="text-sm font-medium text-gray-500">
                 {LABELS.dashboard.gainPercentage}
               </h3>
-              <p className="mt-1 text-2xl font-bold 
-                {gainPercentage >= 0 ? 'text-green-600' : 'text-red-600'}
-              <p className=`{mt-1 text-2xl font-bold ${gainPercentage >= 0 ? "text-green-600" : "text-red-600"}}`>
+              <p className={`mt-1 text-2xl font-bold ${gainPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {formatPercentage(gainPercentage)}
+              </p>
             </div>
             
             {/* Objectif annuel */}
@@ -115,9 +115,9 @@ const Dashboard = () => {
               <h3 className="text-sm font-medium text-gray-500">
                 {LABELS.dashboard.abondementReceived}
               </h3>
-                <p className="mt-1 text-xl font-bold text-gray-900">
-                  {formatNumber(yearEndProjection.projectedAbondement)}
-                </p>
+              <p className="mt-1 text-xl font-bold text-gray-900">
+                {formatNumber(ytdAbondementReceived)}
+              </p>
             </div>
             
             {/* Abondement restant */}
