@@ -118,7 +118,7 @@ const Dashboard = () => {
             <div className="bg-white rounded-lg shadow p-4">
               <h3 className="text-sm font-medium text-gray-500">
                 {LABELS.dashboard.abondementReceived}
-              </h3
+              </h3>
                 <p className="mt-1 text-xl font-bold text-gray-900">
                   {formatNumber(yearEndProjection.projectedAbondement)}
                 </p>
