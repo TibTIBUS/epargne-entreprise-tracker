@@ -1,112 +1,75 @@
 # Suivi de mon épargne entreprise
 
-Application web de suivi d'épargne entreprise avec calcul d'abondement et projections, déployable sur GitHub + Netlify.
+Application de suivi de l'épargne entreprise : versements personnels,
+abondement employeur, plus-value de marché, projections fin d'année
+et à 10 ans, blocage à 5 ans.
 
-## Fonctionnalités
+## Stack
 
-- �� 📊 **Tableau de bord** : Visualisation claire des versements, abondement, capital total et plus-value
-- �� 📝 **Mise à jour mensuelle** : Formulaire simple pour enregistrer vos opérations
-- �� 📈 **Graphiques interactifs** : 
-  - Évolution année en cours
-  - Prévision fin d'année
-  - Prévision sur 10 ans
-- �� 💾 **Stockage local** : 100% basé sur `localStorage` avec export/import JSON
-- �� ⚙��️ **Paramètres configurables** : Ajustez les taux, plafonds et autres hypothèses
-- �� 📱 **Responsive** : Optimisé pour mobile et desktop
-- �� 🇫���🇷 **Interface en français** : Terminologie financière claire
+React 18 + Vite + Tailwind CSS + Recharts. Aucun backend : les données sont
+stockées uniquement dans le `localStorage` du navigateur utilisé.
+
+## Limites du stockage local (important)
+
+- Les données ne sont visibles que dans **le navigateur où elles ont été
+  saisies**. Pas de compte, pas de synchronisation entre appareils.
+- Vider le cache du navigateur, utiliser la navigation privée, ou changer
+  d'appareil fait repartir l'app à zéro.
+- Utilisez le bouton **Exporter mes données (JSON)** dans les Paramètres
+  régulièrement pour avoir une sauvegarde, et **Importer un fichier JSON**
+  pour la restaurer (y compris sur un autre appareil/navigateur).
+
+## Démarrage
+
+```bash
+npm install
+npm run dev       # serveur de développement
+npm run build     # build de production dans dist/
+npm run preview   # prévisualiser le build localement
+```
 
 ## Déploiement
 
-### Prérequis
-- Node.js (v16+)
-- npm ou yarn
+Le dépôt est connecté à Netlify (`netlify.toml` à la racine). Tout push sur
+`main` déclenche un build (`npm run build`) et un déploiement automatique.
 
-### Installation locale
-```bash
-# Cloner le dépôt
-git clone <votre-depot-github>
-cd epargne-entreprise-tracker
+## Modifier les hypothèses de calcul
 
-# Installer les dépendances
-npm install
+Deux façons :
 
-# Lancer en développement
-npm run dev
-```
+1. **Sans toucher au code** : bouton "⚙️ Paramètres" dans l'application —
+   montant de versement habituel, nombre de versements par an, ratio et
+   plafond d'abondement, taux de rendement.
+2. **Valeurs par défaut** (si vous préférez les changer dans le code) :
+   `src/utils/constants.js`, objet `DEFAULT_SETTINGS`.
 
-### Build pour production
-```bash
-npm run build
-```
+## Logique de calcul
 
-### Déploiement sur Netlify
-1. Poussez votre code sur GitHub
-2. Connectez votre dépôt à Netlify
-3. Netlify détectera automatiquement :
-   - Commande de build : `npm run build`
-   - Répertoire de publication : `dist`
-4. Votre site sera déployé à l'URL fournie par Netlify
+Toutes les fonctions de calcul sont des fonctions pures, sans dépendance à
+React, regroupées dans `src/utils/calculations.js` :
 
-## Utilisation
+- `getTotalContributions` / `getTotalAbondement` : sommes à partir des
+  opérations saisies.
+- `getCurrentValue` : dernière valeur de portefeuille saisie (remplace,
+  ne s'additionne pas), ou capital investi si aucun relevé n'a encore
+  été saisi.
+- `getTotalGain` = abondement total + plus-value de marché.
+- `getYearEndProjection` / `getTenYearProjection` : projections basées sur
+  le rythme de versement défini dans les Paramètres. N'affichées que si
+  au moins une opération existe (sinon la projection n'a pas de sens).
+- `getBlockingInfo` : disponibilité individuelle de chaque versement,
+  5 ans après sa date (configurable).
 
-1. **Première utilisation** :
-   - L'application démarre avec des données vides
-   - Utilisez le formulaire "Mettre à jour mes données" pour saisir :
-     - Votre versement personnel du mois
-     - L'abondement employeur reçu
-     - La valeur actuelle totale (à partir de vos relevés)
-   - Cliquez sur "Enregistrer"
+## Ajouter mes données
 
-2. **Mises à jour mensuelles** :
-   - Répétez le processus chaque mois avec vos nouveaux relevés
-   - L'historique s'accumule automatiquement
+Section "Ajouter une opération" en haut du tableau de bord : renseignez un
+ou plusieurs des trois champs (versement personnel, abondement reçu, valeur
+totale actuelle du portefeuille) avec la date réelle du relevé, puis
+"Enregistrer". Répétez pour chaque relevé mensuel.
 
-3. **Analyse des résultats** :
-   - Le tableau de bord affiche vos KPIs principaux
-   - Les graphiques montrent l'évolution et les projections
-   - Le panneau d'information indique vos dates de disponibilité (blocage 5 ans)
+## Historique
 
-4. **Gestion des données** :
-   - **Exporter** : Sauvegardez vos données via le menu Paramètres
-   - **Importer** : Restaurez vos données à partir d'un fichier JSON
-   - **Réinitialiser** : Remettez les paramètres par défaut ou supprimez toutes les données
-
-## Personnalisation
-
-### Paramètres ajustables
-Dans le menu Paramètres, vous pouvez modifier :
-- Montant de base par versement (défaut : 165€)
-- Nombre de versements par an (défaut : 10)
-- Ratio d'abondement (défaut : 1,5×)
-- Plafond annuel d'abondement (défaut : 2500€)
-- Taux de rendement annuel moyen pour les projections (défaut : 4% avec options 2%/6%)
-
-### Stockage des données
-- Toutes vos données sont stockées dans le `localStorage` de votre navigateur
-- Aucune donnée n'est envoyée à un serveur externe
-- Pour synchroniser entre appareils : exportez sur l'appareil A, importez sur l'appareil B
-
-## Notes importantes
-
-### Calcul de l'abondement
-L'abondement employeur est calculé comme :
-```
-abondement = min(versements_personnels_annuels × ratio, plafond_annuel)
-```
-Avec :
-- `ratio` : configurable (défaut : 1,5)
-- `plafond_annuel` : configurable (défaut : 2500€)
-
-### Projections
-- **Projection fin d'année** : Part de votre capital actuel + ajoute les versements/abondements restants de l'année courante avec un rendement composé mensuel
-- **Projection 10 ans** : Part de votre capital actuel + ajoute les apports annuels récurrents avec un rendement annuel composé
-
-### Blocage de 5 ans
-Chaque versement devient disponible exactement 5 ans après sa date de versement. Le panneau d'information indique :
-- Le montant déjà disponible
-- La date de disponibilité du prochain versement
-- Le détail historique par versement
-
-## Support
-
-Pour toute question ou suggestion d'amélioration, n'hésitez pas à ouvrir une issue sur le dépôt GitHub.
+Version 2 (août 2026) : réécriture complète suite à plusieurs incidents en
+production (balises JSX mal fermées, variable de contexte fantôme,
+référence non déclarée, fichier corrompu). Voir les commits de cette date
+pour le détail de chaque cause racine corrigée structurellement.
