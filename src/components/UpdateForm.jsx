@@ -42,12 +42,12 @@ const UpdateForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-xl2 shadow-sm border border-brand-100 p-6">
       <h2 className="text-lg font-bold mb-1">{LABELS.updateForm.title}</h2>
-      <p className="text-sm text-gray-500 mb-4">{LABELS.updateForm.helper}</p>
+      <p className="text-sm text-ink-500 mb-4">{LABELS.updateForm.helper}</p>
 
       {status === 'success' && (
-        <div className="mb-4 p-3 bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 text-sm">
+        <div className="mb-4 p-3 bg-brand-50 border-l-4 border-brand-500 text-brand-700 text-sm">
           {LABELS.updateForm.successMessage}
         </div>
       )}
@@ -59,7 +59,7 @@ const UpdateForm = () => {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-ink-700 mb-1">
             {LABELS.updateForm.contributionLabel}
           </label>
           <input
@@ -69,12 +69,12 @@ const UpdateForm = () => {
             value={form.contribution}
             onChange={(e) => setForm({ ...form, contribution: e.target.value })}
             placeholder="Ex : 165"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-ink-700 mb-1">
             {LABELS.updateForm.abondementLabel}
           </label>
           <input
@@ -84,12 +84,12 @@ const UpdateForm = () => {
             value={form.abondement}
             onChange={(e) => setForm({ ...form, abondement: e.target.value })}
             placeholder="Ex : 247,50"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-ink-700 mb-1">
             {LABELS.updateForm.marketValueLabel}
           </label>
           <input
@@ -99,17 +99,17 @@ const UpdateForm = () => {
             value={form.marketValue}
             onChange={(e) => setForm({ ...form, marketValue: e.target.value })}
             placeholder="Ex : 5000"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">{LABELS.updateForm.dateLabel}</label>
+          <label className="block text-sm font-medium text-ink-700 mb-1">{LABELS.updateForm.dateLabel}</label>
           <input
             type="date"
             value={form.date}
             onChange={(e) => setForm({ ...form, date: e.target.value })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           />
         </div>
 
@@ -117,13 +117,13 @@ const UpdateForm = () => {
           <button
             type="button"
             onClick={resetForm}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
+            className="px-5 py-2.5 bg-white text-brand-700 border border-brand-300 rounded-full hover:bg-brand-50 font-medium text-sm"
           >
             {LABELS.updateForm.resetButton}
           </button>
           <button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-6 py-2.5 bg-brand-500 text-white rounded-full hover:bg-brand-600 font-semibold text-sm shadow-sm"
           >
             {LABELS.updateForm.submitButton}
           </button>
