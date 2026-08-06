@@ -9,10 +9,19 @@ import ProjectionCard from './ProjectionCard';
 import InfoPanel from './InfoPanel';
 import SettingsModal from './SettingsModal';
 
-const KpiCard = ({ label, value, valueClassName = 'text-gray-900' }) => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <p className="text-sm font-medium text-gray-500">{label}</p>
-    <p className={`mt-1 text-2xl font-bold ${valueClassName}`}>{value}</p>
+// Marque abstraite à quatre lobes, dans l'esprit du symbole BNP Paribas
+// (forme originale, pas une reproduction du logo protégé).
+const BrandMark = ({ className = '' }) => (
+  <svg viewBox="0 0 32 32" className={className} fill="currentColor" aria-hidden="true">
+    <path d="M16 2c1 4 3 6 7 7-4 1-6 3-7 7-1-4-3-6-7-7 4-1 6-3 7-7z" />
+    <path d="M16 16c1 4 3 6 7 7-4 1-6 3-7 7-1-4-3-6-7-7 4-1 6-3 7-7z" opacity="0.55" />
+  </svg>
+);
+
+const KpiCard = ({ label, value, valueClassName = 'text-ink-900' }) => (
+  <div className="bg-white rounded-xl2 shadow-sm border border-brand-100 p-5">
+    <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">{label}</p>
+    <p className={`mt-2 text-2xl font-extrabold ${valueClassName}`}>{value}</p>
   </div>
 );
 
@@ -31,10 +40,13 @@ const Dashboard = () => {
   const abondementRemaining = Math.max(0, settings.ABONDMENT_ANNUAL_CAP - ytdAbondement);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">{LABELS.appTitle}</h1>
+    <div className="min-h-screen bg-brand-50">
+      <header className="bg-brand-500 shadow-md">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <BrandMark className="w-7 h-7 text-white" />
+            <h1 className="text-lg font-bold text-white tracking-tight">{LABELS.appTitle}</h1>
+          </div>
           <SettingsModal />
         </div>
       </header>
@@ -47,12 +59,12 @@ const Dashboard = () => {
           <KpiCard
             label={LABELS.dashboard.totalGain}
             value={formatCurrency(totalGain)}
-            valueClassName={totalGain >= 0 ? 'text-emerald-600' : 'text-red-600'}
+            valueClassName={totalGain >= 0 ? 'text-brand-600' : 'text-red-600'}
           />
           <KpiCard
             label={LABELS.dashboard.gainPercentage}
             value={formatPercentage(gainPercentage)}
-            valueClassName={gainPercentage >= 0 ? 'text-emerald-600' : 'text-red-600'}
+            valueClassName={gainPercentage >= 0 ? 'text-brand-600' : 'text-red-600'}
           />
           <KpiCard label={LABELS.dashboard.abondementReceivedYear} value={formatCurrency(ytdAbondement)} />
           <KpiCard label={LABELS.dashboard.abondementRemainingYear} value={formatCurrency(abondementRemaining)} />
@@ -63,7 +75,7 @@ const Dashboard = () => {
                 ? formatMonthYear(blockingInfo.nextAvailableDate)
                 : LABELS.dashboard.available
             }
-            valueClassName={blockingInfo.nextAvailableDate ? 'text-gray-900' : 'text-emerald-600'}
+            valueClassName={blockingInfo.nextAvailableDate ? 'text-ink-900' : 'text-brand-600'}
           />
         </section>
 
