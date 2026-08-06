@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { LABELS } from '../utils/constants';
 
 const InfoPanel = () => {
-  const { blockingInfo, LABELS } = useApp();
+  const { blockingInfo } = useApp();
   
   const formatNumber = (num) => new Intl.NumberFormat('fr-FR', {
     style: 'currency',
