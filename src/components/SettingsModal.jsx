@@ -182,7 +182,7 @@ const SettingsModal = () => {
               <div className="border-t pt-6">
                 <h3 className="text-lg font-medium mb-4">
                   {LABELS.settingsModal.exportData}
-                </label>
+                </h3>
                 <button
                   onClick={handleExport}
                   className="w-full mb-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
