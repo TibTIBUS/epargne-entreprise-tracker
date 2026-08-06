@@ -1,11 +1,20 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { LABELS } from '../utils/constants';
+import { formatCurrency, formatPercentage, formatMonthYear } from '../utils/format';
 import UpdateForm from './UpdateForm';
-import Charts from './Charts';
+import YearlyChart from './YearlyChart';
+import TenYearChart from './TenYearChart';
 import ProjectionCard from './ProjectionCard';
 import InfoPanel from './InfoPanel';
 import SettingsModal from './SettingsModal';
+
+const KpiCard = ({ label, value, valueClassName = 'text-gray-900' }) => (
+  <div className="bg-white rounded-lg shadow p-4">
+    <p className="text-sm font-medium text-gray-500">{label}</p>
+    <p className={`mt-1 text-2xl font-bold ${valueClassName}`}>{value}</p>
+  </div>
+);
 
 const Dashboard = () => {
   const {
@@ -14,157 +23,60 @@ const Dashboard = () => {
     currentValue,
     totalGain,
     gainPercentage,
-    yearlyChartData,
-    yearEndProjection,
-    tenYearProjection,
-    blockingInfo,
-    ytdAbondementReceived
+    ytdAbondement,
+    settings,
+    blockingInfo
   } = useApp();
 
-  const formatNumber = (num) => new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'EUR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  }).format(num);
-
-  const formatPercentage = (num) => new Intl.NumberFormat('fr-FR', {
-    style: 'percent',
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1
-  }).format(num / 100);
+  const abondementRemaining = Math.max(0, settings.ABONDMENT_ANNUAL_CAP - ytdAbondement);
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-md">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {LABELS.dashboard.title}
-          </h1>
+      <header className="bg-white shadow-sm border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-gray-900">{LABELS.appTitle}</h1>
+          <SettingsModal />
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* KPIs principaux */}
-        <div className="grid gap-6 mb-8">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Total versements */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.totalContributions}
-              </h3>
-              <p className="mt-1 text-2xl font-bold text-gray-900">
-                {formatNumber(totalContributions)}
-              </p>
-            </div>
-            
-            {/* Total abondement */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.totalAbondement}
-              </h3>
-              <p className="mt-1 text-2xl font-bold text-gray-900">
-                {formatNumber(totalAbondement)}
-              </p>
-            </div>
-            
-            {/* Capital total */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.totalCapital}
-              </h3>
-              <p className="mt-1 text-2xl font-bold text-gray-900">
-                {formatNumber(currentValue)}
-              </p>
-            </div>
-            
-            {/* Plus-value totale */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.totalGain}
-              </h3>
-              <p className={`mt-1 text-2xl font-bold ${totalGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatNumber(totalGain)}
-              </p>
-            </div>
-          </div>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <KpiCard label={LABELS.dashboard.totalContributions} value={formatCurrency(totalContributions)} />
+          <KpiCard label={LABELS.dashboard.totalAbondement} value={formatCurrency(totalAbondement)} />
+          <KpiCard label={LABELS.dashboard.totalCapital} value={formatCurrency(currentValue)} />
+          <KpiCard
+            label={LABELS.dashboard.totalGain}
+            value={formatCurrency(totalGain)}
+            valueClassName={totalGain >= 0 ? 'text-emerald-600' : 'text-red-600'}
+          />
+          <KpiCard
+            label={LABELS.dashboard.gainPercentage}
+            value={formatPercentage(gainPercentage)}
+            valueClassName={gainPercentage >= 0 ? 'text-emerald-600' : 'text-red-600'}
+          />
+          <KpiCard label={LABELS.dashboard.abondementReceivedYear} value={formatCurrency(ytdAbondement)} />
+          <KpiCard label={LABELS.dashboard.abondementRemainingYear} value={formatCurrency(abondementRemaining)} />
+          <KpiCard
+            label={LABELS.dashboard.blockingHorizon}
+            value={
+              blockingInfo.nextAvailableDate
+                ? formatMonthYear(blockingInfo.nextAvailableDate)
+                : LABELS.dashboard.available
+            }
+            valueClassName={blockingInfo.nextAvailableDate ? 'text-gray-900' : 'text-emerald-600'}
+          />
+        </section>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Pourcentage de plus-value */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.gainPercentage}
-              </h3>
-              <p className={`mt-1 text-2xl font-bold ${gainPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {formatPercentage(gainPercentage)}
-              </p>
-            </div>
-            
-            {/* Objectif annuel */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.annualObjective}
-              </h3>
-              <p className="mt-1 text-xl font-bold text-gray-900">
-                {formatNumber(yearEndProjection.projectedContributions + yearEndProjection.projectedAbondement)}
-              </p>
-            </div>
-            
-            {/* Abondement reçu cette année */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.abondementReceived}
-              </h3>
-              <p className="mt-1 text-xl font-bold text-gray-900">
-                {formatNumber(ytdAbondementReceived)}
-              </p>
-            </div>
-            
-            {/* Abondement restant */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.abondementRemaining}
-              </h3>
-              <p className="mt-1 text-xl font-bold text-gray-900">
-                {formatNumber(Math.max(0, 2500 - yearEndProjection.projectedAbondement))}
-              </p>
-            </div>
-            
-            {/* Horizon de blocage */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
-                {LABELS.dashboard.blockingHorizon}
-              </h3>
-              {blockingInfo.nextAvailableDate ? (
-                <p className="mt-1 text-xl font-bold text-gray-900">
-                  {new Date(blockingInfo.nextAvailableDate).toLocaleDateString('fr-FR', {
-                    year: 'numeric',
-                    month: 'long'
-                  })}
-                </p>
-              ) : (
-                <p className="mt-1 text-xl font-bold text-green-600">
-                  Disponible
-                </p>
-              )}
-            </div>
-          </div>
+        <UpdateForm />
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <YearlyChart />
+          <TenYearChart />
         </div>
 
-        {/* Section principale avec graphiques et panneaux */}
-        <div className="grid gap-6">
-          {/* Colonne principale : Graphiques */}
-          <div className="col-span-1 lg:col-span-2">
-            <UpdateForm />
-            <Charts />
-            <ProjectionCard />
-          </div>
-          
-          {/* Colonne secondaire : Informations et paramètres */}
-          <div className="lg:col-span-1">
-            <InfoPanel />
-            <SettingsModal />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProjectionCard />
+          <InfoPanel />
         </div>
       </main>
     </div>
