@@ -78,8 +78,8 @@ const now = new Date();
   
   // Abondement reçu YTD = min(YTD personal × ratio, plafond annuel)
   const ytdAbondementReceived = Math.min(
-    ytdPersonalContributions * settings.ABONDMENT_RATIO,
-    settings.ABONDMENT_ANNUAL_CAP
+    ytdPersonalContributions * appData.settings.ABONDMENT_RATIO,
+    appData.settings.ABONDMENT_ANNUAL_CAP
   );
   
   const value = {
