@@ -1,138 +1,123 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { loadData, saveData, exportData, importData, clearAllData } from '../utils/storage';
-import { 
-  getTotalContributions, 
-  getTotalAbondement, 
-  getMarketGain, 
-  getTotalGain, 
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { loadData, saveData, clearData, exportDataAsJson, importDataFromJson } from '../utils/storage';
+import { DEFAULT_SETTINGS } from '../utils/constants';
+import {
+  getTotalContributions,
+  getTotalAbondement,
+  getCurrentValue,
+  getTotalGain,
   getGainPercentage,
   getYearlyChartData,
+  getYtdAbondement,
   getYearEndProjection,
   getTenYearProjection,
   getBlockingInfo
 } from '../utils/calculations';
-import { DEFAULT_SETTINGS } from '../utils/constants';
 
-const AppContext = createContext();
+// IMPORTANT — leçon tirée des bugs précédents :
+// 1. Ce contexte n'expose JAMAIS `LABELS`. Les composants importent LABELS
+//    directement depuis utils/constants.js. Ne jamais faire
+//    `const { LABELS } = useApp()` : ça masquerait silencieusement l'import
+//    et planterait au rendu sans erreur de build.
+// 2. `appData` a TOUJOURS la forme { operations, settings } (garanti par
+//    storage.js). On ne référence jamais une variable `settings` locale non
+//    déclarée : tout accès passe explicitement par `appData.settings`.
+
+const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
   const [appData, setAppData] = useState(() => loadData());
+  const { operations, settings } = appData;
 
-  // Sauvegarder automatiquement dans localStorage
   useEffect(() => {
     saveData(appData);
   }, [appData]);
 
-  // Méthodes de mise à jour
   const addOperation = (operation) => {
-    setAppData(prev => ({
+    setAppData((prev) => ({
       ...prev,
-      operations: [...prev.operations, operation]
+      operations: [...prev.operations, { ...operation, id: crypto.randomUUID() }]
     }));
   };
 
-  const updateOperations = (newOperations) => {
-    setAppData(prev => ({
+  const removeOperation = (id) => {
+    setAppData((prev) => ({
       ...prev,
-      operations: newOperations
+      operations: prev.operations.filter((op) => op.id !== id)
     }));
   };
 
-  const updateSettings = (newSettings) => {
-    setAppData(prev => ({
+  const updateSettings = (partialSettings) => {
+    setAppData((prev) => ({
       ...prev,
-      settings: {
-        ...prev.settings,
-        ...newSettings
-      }
+      settings: { ...prev.settings, ...partialSettings }
     }));
   };
 
-  // Getters dérivés
-  const totalContributions = getTotalContributions(appData.operations);
-  const totalAbondement = getTotalAbondement(appData.operations);
-  const currentValueOp = appData.operations
-    .filter(op => op.type === 'marketUpdate')
-    .sort((a, b) => new Date(b.date) - new Date(a.date))[0];
-  
-  const currentValue = currentValueOp ? currentValueOp.amount : 
-    totalContributions + totalAbondement; // Valeur initiale si pas de mise à jour de marché
-    
-  const marketGain = getMarketGain(currentValue, totalContributions, totalAbondement);
-  const totalGain = getTotalGain(marketGain, totalAbondement);
-  const gainPercentage = getGainPercentage(totalGain, totalContributions);
-  
-const now = new Date();
+  const resetSettingsToDefault = () => {
+    setAppData((prev) => ({ ...prev, settings: { ...DEFAULT_SETTINGS } }));
+  };
+
+  const clearAllData = () => {
+    const ok = clearData();
+    if (ok) setAppData(loadData());
+    return ok;
+  };
+
+  const exportJson = () => exportDataAsJson(appData);
+
+  const importJson = (jsonString) => {
+    const result = importDataFromJson(jsonString);
+    if (result) setAppData(result);
+    return Boolean(result);
+  };
+
+  const now = new Date();
   const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1; // 1-12
-  
-  const yearlyChartData = getYearlyChartData(appData.operations, currentYear);
-  const yearEndProjection = getYearEndProjection(appData.settings, appData.operations, currentYear, currentMonth);
-  const tenYearProjection = getTenYearProjection(appData.settings, appData.operations, currentYear);
-  const blockingInfo = getBlockingInfo(appData.operations);
-  
-  // Calcul du total des versements personnels YTD (mois écoulés de l'année en cours)
-  const ytdPersonalContributions = yearlyChartData
-    .slice(0, currentMonth - 1) // mois 0 à currentMonth-2
-    .reduce((sum, month) => sum + month.contributions, 0);
-  
-  // Abondement reçu YTD = min(YTD personal × ratio, plafond annuel)
-  const ytdAbondementReceived = Math.min(
-    ytdPersonalContributions * appData.settings.ABONDMENT_RATIO,
-    appData.settings.ABONDMENT_ANNUAL_CAP
-  );
-  
+  const currentMonth = now.getMonth() + 1;
+
+  const totalContributions = getTotalContributions(operations);
+  const totalAbondement = getTotalAbondement(operations);
+  const currentValue = getCurrentValue(operations);
+  const totalGain = getTotalGain(operations);
+  const gainPercentage = getGainPercentage(operations);
+  const yearlyChartData = getYearlyChartData(operations, currentYear);
+  const ytdAbondement = getYtdAbondement(operations, currentYear);
+  const yearEndProjection = getYearEndProjection(operations, settings, currentYear, currentMonth);
+  const tenYearProjection = getTenYearProjection(operations, settings, currentYear);
+  const blockingInfo = getBlockingInfo(operations, settings.BLOCKING_YEARS);
+
   const value = {
-    // État
-    ...appData,
-    
-    // Données dérivées
+    operations,
+    settings,
+    currentYear,
+    currentMonth,
+
     totalContributions,
     totalAbondement,
     currentValue,
-    marketGain,
     totalGain,
     gainPercentage,
     yearlyChartData,
+    ytdAbondement,
     yearEndProjection,
     tenYearProjection,
     blockingInfo,
-    ytdAbondementReceived,
-    currentYear,
-    currentMonth,
-    
-    // Actions
+
     addOperation,
-    updateOperations,
+    removeOperation,
     updateSettings,
-    exportData: () => exportData(appData),
-    importData: (json) => {
-      const success = importData(json);
-      if (success) {
-        setAppData(loadData());
-      }
-      return success;
-    },
-    clearAllData: () => {
-      const success = clearAllData();
-      if (success) {
-        setAppData(loadData());
-      }
-      return success;
-    }
+    resetSettingsToDefault,
+    clearAllData,
+    exportJson,
+    importJson
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
 
 export const useApp = () => {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error('useApp doit être utilisé dans AppProvider');
-  }
-  return context;
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error('useApp() doit être appelé à l\'intérieur de <AppProvider>');
+  return ctx;
 };
