@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Application de suivi d'épargne entreprise avec calcul d'abondement et projections",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
