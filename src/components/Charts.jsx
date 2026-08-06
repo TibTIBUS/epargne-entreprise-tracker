@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Responsi
 import { LABELS } from '../utils/constants';
 
 const Charts = () => {
-  const { yearlyChartData, LABELS } = useApp();
+  const { yearlyChartData } = useApp();
 
   if (yearlyChartData.length === 0) {
     return (

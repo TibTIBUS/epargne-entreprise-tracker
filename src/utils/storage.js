@@ -22,12 +22,6 @@ export const loadData = () => {
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error);
     return { ...DEFAULT_SETTINGS, operations: [], settings: DEFAULT_SETTINGS };
-  }
-};
-
-export const saveData = (data) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     return true;
   } catch (error) {
     console.error('Erreur lors de la sauvegarde des données:', error);
