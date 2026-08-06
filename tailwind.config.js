@@ -4,13 +4,29 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Palette calquée sur l'identité BNP Paribas.
+        // Vert primaire officiel #00965E (source : charte de marque BNP Paribas).
         brand: {
-          50: '#f0fdf9',
-          100: '#ccfbef',
-          500: '#10b981',
-          600: '#059669',
-          700: '#047857'
+          50: '#EAF6F0',   // fond de page, teinte très légère
+          100: '#CDEBDD',  // badges / surlignage doux
+          200: '#8BC8AA',  // vert clair secondaire (dégradés, hover discret)
+          400: '#00A86B',
+          500: '#00965E',  // vert BNP Paribas officiel — couleur de marque principale
+          600: '#007A4D',  // hover / actif
+          700: '#005C3B',  // texte sur fond clair, variante foncée
+          900: '#00331F'
+        },
+        ink: {
+          900: '#161616',
+          700: '#3B3B3B',
+          500: '#6B7280'
         }
+      },
+      fontFamily: {
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'sans-serif']
+      },
+      borderRadius: {
+        xl2: '1.25rem'
       }
     }
   },
