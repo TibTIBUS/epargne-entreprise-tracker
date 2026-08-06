@@ -1,27 +1,31 @@
 import { DEFAULT_SETTINGS } from './constants.js';
 
-const STORAGE_KEY = 'epargneEntrepriseData';
+const STORAGE_KEY = 'epargneEntrepriseData.v2';
 
-// Structure des données stockées
+// Shape canonique unique de l'état applicatif. TOUTE fonction qui retourne
+// des données de l'app doit respecter exactement cette forme :
+//   { operations: Array, settings: { ...DEFAULT_SETTINGS } }
+// Ne jamais retourner une variante partielle (ex: sans `settings`) : c'est
+// exactement ce qui a causé le crash au premier chargement dans la v1.
+const emptyState = () => ({
+  operations: [],
+  settings: { ...DEFAULT_SETTINGS }
+});
+
 export const loadData = () => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      const parsed = JSON.parse(data);
-      // S'assurer que les paramètres existent (rétrocompatibilité)
-      return {
-        ...DEFAULT_SETTINGS,
-        ...parsed,
-        settings: {
-          ...DEFAULT_SETTINGS,
-          ...(parsed.settings || {})
-        }
-      };
-    }
-    return { ...DEFAULT_SETTINGS, operations: [], settings: { ...DEFAULT_SETTINGS } };
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return emptyState();
+
+    const parsed = JSON.parse(raw);
+
+    return {
+      operations: Array.isArray(parsed.operations) ? parsed.operations : [],
+      settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) }
+    };
   } catch (error) {
-    console.error('Erreur lors du chargement des données:', error);
-    return { ...DEFAULT_SETTINGS, operations: [], settings: { ...DEFAULT_SETTINGS } };
+    console.error('Erreur lors du chargement des données :', error);
+    return emptyState();
   }
 };
 
@@ -30,37 +34,37 @@ export const saveData = (data) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     return true;
   } catch (error) {
-    console.error('Erreur lors de la sauvegarde des données:', error);
+    console.error('Erreur lors de la sauvegarde des données :', error);
     return false;
   }
 };
 
-export const exportData = () => {
-  const data = loadData();
-  return JSON.stringify(data, null, 2);
-};
+export const exportDataAsJson = (data) => JSON.stringify(data, null, 2);
 
-export const importData = (jsonString) => {
+export const importDataFromJson = (jsonString) => {
   try {
-    const data = JSON.parse(jsonString);
-    // Validation basique
-    if (typeof data !== 'object' || Array.isArray(data)) {
-      throw new Error('Format de données invalide');
+    const parsed = JSON.parse(jsonString);
+    if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+      throw new Error('Format invalide');
     }
-    saveData(data);
-    return true;
+    const safe = {
+      operations: Array.isArray(parsed.operations) ? parsed.operations : [],
+      settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) }
+    };
+    saveData(safe);
+    return safe;
   } catch (error) {
-    console.error('Erreur lors de l\'importation des données:', error);
-    return false;
+    console.error("Erreur lors de l'import :", error);
+    return null;
   }
 };
 
-export const clearAllData = () => {
+export const clearData = () => {
   try {
     localStorage.removeItem(STORAGE_KEY);
     return true;
   } catch (error) {
-    console.error('Erreur lors de la suppression des données:', error);
+    console.error('Erreur lors de la suppression :', error);
     return false;
   }
 };
