@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { LABELS } from '../utils/constants';
 
 const ProjectionCard = () => {
-  const { yearEndProjection, LABELS } = useApp();
+  const { yearEndProjection } = useApp();
   
   const formatNumber = (num) => new Intl.NumberFormat('fr-FR', {
     style: 'currency',
@@ -38,9 +38,7 @@ const ProjectionCard = () => {
           <span className="text-gray-600">
             {LABELS.projectionCard.projectedGain}
           </span>
-          <span className="font-medium 
-            {yearEndProjection.projectedGain >= 0 ? 'text-green-600' : 'text-red-600'}
-          ">
+          <span className={`font-medium ${yearEndProjection.projectedGain >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatNumber(yearEndProjection.projectedGain)}
           </span>
         </div>
@@ -49,9 +47,7 @@ const ProjectionCard = () => {
           <span className="text-gray-600">
             {LABELS.projectionCard.gainPercentage}
           </span>
-          <span className="font-medium 
-            {yearEndProjection.gainPercentage >= 0 ? 'text-green-600' : 'text-red-600'}
-          ">
+          <span className={`font-medium ${yearEndProjection.gainPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatPercentage(yearEndProjection.gainPercentage)}
           </span>
         </div>
