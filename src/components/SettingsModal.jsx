@@ -42,7 +42,7 @@ const SettingsModal = () => {
   };
 
   const handleClear = () => {
-    if (window.confirm('�Êtes-vous sûr de vouloir supprimer toutes vos données ? Cette action est irréversible.')) {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer toutes vos données ? Cette action est irréversible.')) {
       const success = clearAllData();
       setClearStatus(success ? 'success' : 'error');
       if (!success) setTimeout(() => setClearStatus(null), 3000);
@@ -55,7 +55,7 @@ const SettingsModal = () => {
         onClick={() => setIsOpen(true)}
         className="text-sm text-blue-600 hover:underline mb-4"
       >
-        �� ⚙��️ {LABELS.settingsModal.title}
+         ⚙️ {LABELS.settingsModal.title}
       </button>
       
       {/* Modal */}
@@ -182,7 +182,7 @@ const SettingsModal = () => {
               <div className="border-t pt-6">
                 <h3 className="text-lg font-medium mb-4">
                   {LABELS.settingsModal.exportData}
-                </label>
+                </h3>
                 <button
                   onClick={handleExport}
                   className="w-full mb-3 px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"

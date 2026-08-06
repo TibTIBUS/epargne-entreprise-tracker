@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { LABELS } from '../utils/constants';
 
 const InfoPanel = () => {
-  const { blockingInfo, LABELS } = useApp();
+  const { blockingInfo } = useApp();
   
   const formatNumber = (num) => new Intl.NumberFormat('fr-FR', {
     style: 'currency',
@@ -74,7 +74,7 @@ const InfoPanel = () => {
         <div className="border-t pt-4">
           <h3 className="text-lg font-medium mb-2">
             {LABELS.infoPanel.notes}
-          </span>
+          </h3>
           <p className="text-sm text-gray-600">
             Les calculs sont basés sur vos déclarations :
             <br />

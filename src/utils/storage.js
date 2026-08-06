@@ -18,10 +18,10 @@ export const loadData = () => {
         }
       };
     }
-    return { ...DEFAULT_SETTINGS, operations: [] };
+    return { ...DEFAULT_SETTINGS, operations: [], settings: DEFAULT_SETTINGS };
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error);
-    return { ...DEFAULT_SETTINGS, operations: [] };
+    return { ...DEFAULT_SETTINGS, operations: [], settings: DEFAULT_SETTINGS };
   }
 };
 
