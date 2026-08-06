@@ -1,7 +1,0 @@
-npm error code ENOTEMPTY
-npm error syscall rename
-npm error path /mnt/c/Projets/epargne-entreprise-tracker/node_modules/caniuse-lite
-npm error dest /mnt/c/Projets/epargne-entreprise-tracker/node_modules/.caniuse-lite-VQKDnoru
-npm error errno -39
-npm error ENOTEMPTY: directory not empty, rename '/mnt/c/Projets/epargne-entreprise-tracker/node_modules/caniuse-lite' -> '/mnt/c/Projets/epargne-entreprise-tracker/node_modules/.caniuse-lite-VQKDnoru'
-npm error A complete log of this run can be found in: /home/tibmarie/.npm/_logs/2026-08-06T08_35_50_872Z-debug-0.log
